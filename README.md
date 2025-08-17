@@ -20,7 +20,7 @@ J < 0 : Anti-Ferromagnetic(이웃 스핀이 반대 방향을 선호)
 
 
 
-# 몬테카를로 시뮬레이션
+# Monte Carlo Simulation
 
 몬테카를로 시뮬레이션은 난수(랜덤 숫자)를 이용해 어떤 물리적, 공학적 문제를 확률적으로 묘사하는 방법이다.
 복잡한 물리계(ex) spin들의 상호작용)는 정확한 해를 구하기 어렵다. 이러한 현상을 모델링하여 무작위로 반복해서 평균을 내면 실제 해와 점점 가까워진다.
@@ -40,8 +40,40 @@ plt.imshow((state+1)//2, cmap=cmap)
 plt.show()
 ```
 
-<img width="628" height="592" alt="image" src="https://github.com/user-attachments/assets/680097a8-f5af-401c-9db2-55a14232da95" />
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/680097a8-f5af-401c-9db2-55a14232da95" />
 
 
 
+# 2-D Ising Model using Metropolis Monte Carlo
+
+Metropolis 몬테카를로 방법을 이용해 2D Ising model를 구현하는 기본 아이디어는 다음과 같다.
+
+- [+1. -1] 가진 spin을 무작위로 n × n 격자에 생성한다.
+- 무작위로 스핀 하나(Sij)를 선택한 후, 스위칭을 진행하고(ex: +1 -> -1) 인접한 4개의 스핀과 Δ E를 계산한다.
+- Δ E > 0일 경우, 에너지가 줄어들었기에 스위칭 된 상태를 유지힌다.
+- Δ E < 0일 경우, e^{-ΔE/k_BT} 볼츠만 분포에 따라 확률적으로 결정된다. 0과 1사이의 난수를 뽑고 e^{-ΔE/k_BT} 보다 작을 경우 스위칭 된 상태 유지, 클 경우 기존의 상태를 유지한다.
+- e^{-ΔE/k_BT} 볼츠만 분포에 따라 결정되는 것을 Metropolis 알고리즘 방식이라고 한다. 이러한 규칙을 따르는 Metropolis 알고리즘은, 열적 요동(thermal fluctuation)을 나타내며 볼츠만 분포에 따른 올바른 평형 상태를 재현할 수 있도록 한다.
+
+<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/be093bb3-16b0-40a8-a56d-b5d95b94ae85" />
+
+
+
+```python
+a = np.random.randint(0, N)
+b = np.random.randint(0, N)
+s =  config[a, b]
+nb = config[(a+1)%N,b] + config[a,(b+1)%N] + config[(a-1)%N,b] + config[a,(b-1)%N]
+cost = 2*s*nb
+if cost < 0:
+ s *= -1
+elif rand() < np.exp(-cost*beta):
+ s *= -1
+config[a, b] = s
+```
+
+# Anisotropic Ising Model 
+
+isotropic의 경우 방향과 상관없이 J가 같지만, Anisotropic의 경우 방향에 따라 J가 다르다. 즉, Jx ≠ Jy
+
+<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/d60e6696-5de7-4207-9572-810e9b325cf5" />
 
