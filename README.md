@@ -1,9 +1,4 @@
-# anisotropic-ising-model
+# Monte Carlo Simulation of Anisotropic Ising Model-tutorial
 
-1) Ising model
-
- Ising model은 물리학자 Ernst ising과 Wilhelm Lenz의 이름을 딴 것으로, 통계역학에서 강자성체를 설명하기 위한 수학적 모델이다.
-
-이 모델의 원자 스핀은 두 가지 상태(+1 or –1)를 가질 수 있으며, 각 스핀은 이웃 스핀과 상호작용한다.
-
-Ising model의 Hamiltonian은 다음과 같이 정의된다.
+이 튜토리얼은 기존의 Ising model에서 교환상수 J를 Jx, Jy로 나누어 Jy/Jx 비율에 따른 상전이 시점 변화를 몬테카를로 시뮬레이션을 통해 분석했다.
+본 Anisotropic Ising Model의 코드는 https://rajeshrinet.github.io/blog/2014/ising-model/ 의 Isiotropic Ising model을 기반으로 작성하였다.
