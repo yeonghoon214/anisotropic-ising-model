@@ -161,5 +161,27 @@ Monte Carlo step(MCStep) 한번은 N × N번 스핀을 무작위로 선택해 �
 관측값 하나를 얻기 위해서는 지정한 mcSteps 횟수(1024)만큼 이 과정을 반복해 평균을 낸다.
 이렇게 얻은 값을 온도 구간을 나눈 개수(nt)만큼 반복하면 시뮬레이션이 완료된다.  
 
+nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까워지지만, 그만큼 시뮬레이션 속도는 느려진다는 단점이 있다.
 추가적으로, Jx < 0 , Jy > 0 로 설정하여 x축은 Anti-Ferromagnetic을 선호하고 y축은 Ferromagnetic을 선호하게 모델링하였다.  
+
+
+여기서 분석하는 물리량은 에너지(E), 비열(C), 자화(M), 자기 감수율(X)이며 공식은 다음과 같다.<br>  
+
+```math
+\mathcal{\langle  E \rangle} = \frac{1}{N} \sum_{\langle i \rangle N} H_i
+```
+```math
+\mathcal{\langle  M \rangle} = \frac{1}{N} \sum_{\langle i \rangle N} S_i
+```
+```math
+\mathcal{C} = \frac{B}{T} ( \langle  E^2 \rangle - \langle  E \rangle^2)
+```
+```math
+\mathcal{X} = \frac{B}{T} ( \langle  M^2 \rangle - \langle  M \rangle^2)
+```
+<br> 
+
+비열 C의 공식에서 $( \langle E^2 \rangle - \langle E \rangle^2 )$는 에너지의 분산을 나타낸다. 따라서 C는 T에 따른 에너지의 분산임을 알 수 있으며 자기감수율 X도 이와 같이 T에 따른 자화의 분산이다.
+
+
 
