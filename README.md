@@ -212,7 +212,9 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/4b139704-f275-4164-b2d1-671cfbaf63e8" />
 
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/b2e948be-7584-4837-918e-43e5e1e5dd7c" />
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/814a9e04-7926-4e0d-bcc2-49bc25818aed" />
 
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/a53c5c34-9b6a-4135-9406-cc7cc3cf5a84" />
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/0d4c353b-4054-479b-97b9-6840a96ecb21" />
+
   
