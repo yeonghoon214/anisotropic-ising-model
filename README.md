@@ -182,6 +182,37 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 <br> 
 
 비열 C의 공식에서 $( \langle E^2 \rangle - \langle E \rangle^2 )$는 에너지의 분산을 나타낸다. 따라서 C는 T에 따른 에너지의 분산임을 알 수 있으며 자기감수율 X도 이와 같이 T에 따른 자화의 분산이다.
+<br>
+
+이제 $J_x = -1 , J_y = 0.75$로 교환 상수를 설정하고 몬테카를로 시뮬레이션을 진행하면 결과는 다음과 같다.  
+
+<img width="400" height="720" alt="image" src="https://github.com/user-attachments/assets/63c50447-8e9d-4287-a36a-1be5365c7ec3" />  
+<br>
+
+- 에너지 그래프는 온도가 증가할수록 에너지가 점차 증가하여 시스템이 점점 불안정해짐을 보여준다.
+
+- 비열 그래프는 온도 증가에 따라 상승하다가 특정 온도에서 최대값(peak)을 찍은 뒤 다시 감소하는데, 이는 해당 온도에서 에너지의 요동(분산)이 가장 크다는 것을 의미한다.
+따라서 이 지점이 바로 상전이가 일어나는 임계 온도임을 확인할 수 있다.
+
+다음으로 Jy / |Jx| 의 비율에 따른 상전이 시점 변화를 분석해보겠다.  
+<br>
+<img width="2074" height="902" alt="image" src="https://github.com/user-attachments/assets/1110ed5b-a33b-4b5d-8af1-3718093b5fae" />
+ 
 
 
+- Jy / |Jx| 의 비율이 증가할수록 비열 그래프의 peak가 오른쪽으로 shift하는 것을 확인할 수 있다.
+- Jy / |Jx| 의 비율이 증가할수록 상전이가 일어나는 Transition Temperature가 증가한다는 것을 알 수 있다.
 
+<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/943b00c2-c947-4912-8fb7-b2224709d84f" />
+
+- 위의 그래프를 통해 더 직관적으로 이해할 수 있다.
+- Jy / |Jx| 의 비율이 증가할수록 Transition Temperature가 선형적으로 증가하는것을 보여준다.
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/91da076a-b343-44af-800b-3d25bcc37663" />
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/4b139704-f275-4164-b2d1-671cfbaf63e8" />
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/b2e948be-7584-4837-918e-43e5e1e5dd7c" />
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/a53c5c34-9b6a-4135-9406-cc7cc3cf5a84" />
+  
