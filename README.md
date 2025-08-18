@@ -53,7 +53,7 @@ plt.show()
 
 Metropolis 몬테카를로 방법을 이용해 2D Ising model를 구현하는 기본 아이디어는 다음과 같다.
 
-- [+1, -1] 가진 spin을 무작위로 n × n 격자에 생성한다.  
+- [+1, -1] 가진 spin을 무작위로 N × N 격자에 생성한다.  
   `state = 2*np.random.randint(2, size=(N,N))-1` 
 - 무작위로 스핀 하나(Sab)를 선택한 후, 스위칭을 진행하고(ex: +1 -> -1) 인접한 4개의 스핀과 Δ E를 계산한다.
 - Δ E > 0일 경우, 에너지가 줄어들었기에 스위칭 된 상태를 유지힌다.
@@ -134,22 +134,32 @@ cost = 2 * s * (Jx*nb_x + Jy*nb_y)
  config[a, b] = s
 ```
 <br>
-추가적으로, Jx < 0 , Jy > 0 로 설정하여 x축은 Anti-Ferromagnetic을 선호하고 y축은 Ferromagnetic을 선호하게 모델링하였다.  
-따라서, ground state는 다음과 같은 상태이다.<br>
-(up spin(+1) : 주황색 화살표, down spin(-1) : 파란 화살표) <br>
 
-<br><img width="500" height="200" alt="image" src="https://github.com/user-attachments/assets/8529b4b9-4c38-4570-b857-26f876562a57" />
 
 
 <br>
 
+## Monte Carlo Simulation Results
+
+몬테카를로 시뮬레이션을 돌리기 위해서는 아래와 같은 파라미터들을 설정해야 한다.<br>
+
+```python
+nt      = 100          
+N       = 16          
+eqSteps = 1024        
+mcSteps = 1024        
+Jx, Jy  = -1.0, 0.5
+```
+- nt : 시뮬레이션에서 샘플링할 개수, x축(T)을 몇개의 점으로 나눌 것인지 결정
+- N  : 격자 한변의 길이
+- eqSteps : 평형으로 가기 위한 Monte Carlo steps (시스템을 초기 랜덤 상태에서 안정화시키기 위해)
+- mcSteps : 평형 이후 실제 측정에 사용하는 Monte Carlo steps
+- Jx, Jy  : 교환 상수 J를 변화시키며 상전이 시점을 분석
 
 
+Monte Carlo step(MCStep) 한번은 N × N번 스핀을 무작위로 선택해 에너지 변화를 계산하고 평균을 내는 과정이다.<br>
+관측값 하나를 얻기 위해서는 지정한 mcSteps 횟수(1024)만큼 이 과정을 반복해 평균을 낸다.
+이렇게 얻은 값을 온도 구간을 나눈 개수(nt)만큼 반복하면 시뮬레이션이 완료된다.  
 
-
-
-
-
-
-
+추가적으로, Jx < 0 , Jy > 0 로 설정하여 x축은 Anti-Ferromagnetic을 선호하고 y축은 Ferromagnetic을 선호하게 모델링하였다.  
 
