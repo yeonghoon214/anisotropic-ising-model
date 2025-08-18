@@ -208,13 +208,22 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 - 위의 그래프를 통해 더 직관적으로 이해할 수 있다.
 - Jy / |Jx| 의 비율이 증가할수록 Transition Temperature가 선형적으로 증가하는것을 보여준다.
 
+- Jy / Jx = -0.75
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/91da076a-b343-44af-800b-3d25bcc37663" />
 
+<br>
+
+- Jy / Jx = 0.75
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/4b139704-f275-4164-b2d1-671cfbaf63e8" />
 
+<br>
+
+- T < Transition Temperature
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/814a9e04-7926-4e0d-bcc2-49bc25818aed" />
 
+<br>
 
+- T > Transition Temperature
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/0d4c353b-4054-479b-97b9-6840a96ecb21" />
 
   
