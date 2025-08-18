@@ -227,3 +227,5 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/0d4c353b-4054-479b-97b9-6840a96ecb21" />
 
   
+![ising (2)](https://github.com/user-attachments/assets/90f22188-d600-4b87-b536-6bb5e12a2a14)
+
