@@ -114,7 +114,16 @@ x,y 축의 범위는 (0 ~ N-1)이며, 만약 무작위로 선택된 스핀의 �
 
 
 
-## Anisotropic Ising Model 
+## Anisotropic 2D Ising Model 
+
+Mahrous R. Ahmed 교수님은 xy 평면에서 Anti-ferromagnetic(J1) z축에서 Ferromagnetic(J2)의 상호작용을 갖는 Anisotropic 3D Potts 모델을 통해  
+LaMnO₃의 distortion transition를 분석하였다. J2/J1 비율에 따른 상전이 온도 변화, 엔트로피 변화등을 분석하였으며 해당 논문의 자세한 내용은 아래 링크에서 확인할 수 있다.  <br>
+https://journals.aps.org/prb/abstract/10.1103/PhysRevB.74.014420  <br>
+
+
+저는 이 논문을 참고하여, 동일한 현상이 2D Ising 모델로 단순화하였을 때에도 관찰될 수 있을지 궁금하여  
+Anisotropic 2D Ising Model 분석을 진행하였다. 
+
 
 isotropic의 경우 방향과 상관없이 J가 같지만, Anisotropic의 경우 방향에 따라 J가 다르다. 즉, Jx ≠ Jy
 
@@ -185,21 +194,24 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 추가적으로, Jx < 0 , Jy > 0 로 설정하여 x축은 Anti-Ferromagnetic을 선호하고 y축은 Ferromagnetic을 선호하게 모델링하였다.  
 
 
-여기서 분석하는 물리량은 에너지(E), 비열(C), 자화(M), 자기 감수율(X)이며 공식은 다음과 같다.<br>  
+여기서 분석하는 물리량은 에너지(E), 비열(C), 자화(M), 자기 감수율(X)이며 공식은 다음과 같다.  <br>  
 
 ```math
-\mathcal{\langle  E \rangle} = \frac{1}{N} \sum_{\langle i \rangle N} H_i
+\mathcal{\langle  E \rangle} = \frac{1}{N} \sum^{N}_{\langle i \rangle } H_i
 ```
 ```math
-\mathcal{\langle  M \rangle} = \frac{1}{N} \sum_{\langle i \rangle N} S_i
+\mathcal{\langle  M \rangle} = \frac{1}{N} \sum^{N}_{\langle i \rangle } S_i
 ```
 ```math
-\mathcal{C} = \frac{B}{T} ( \langle  E^2 \rangle - \langle  E \rangle^2)
+\mathcal{C} = \frac{\beta}{T} ( \langle  E^2 \rangle - \langle  E \rangle^2)
 ```
 ```math
-\mathcal{X} = \frac{B}{T} ( \langle  M^2 \rangle - \langle  M \rangle^2)
+\mathcal{X} = \frac{\beta}{T} ( \langle  M^2 \rangle - \langle  M \rangle^2)
 ```
 <br> 
+
+$( \beta= 1/k_b*T )$ 이며 코드에서는 계산의 용이성을 위해 $( k_b=1 )$로 설정하였다. `Beta = iT = 1.0/T[tt]` 
+<br>
 
 비열 C의 공식에서 $( \langle E^2 \rangle - \langle E \rangle^2 )$는 에너지의 분산을 나타낸다. 따라서 C는 T에 따른 에너지의 분산임을 알 수 있으며 자기감수율 X도 이와 같이 T에 따른 자화의 분산이다.
 <br>
@@ -237,6 +249,10 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/4b139704-f275-4164-b2d1-671cfbaf63e8" />
 
 <br>
+
+Transition Temperature를 기준으로 전, 후 스핀들의 배치가 어떻게 변하는 지 확인해보겠다. $( J_x = -1 , J_y = 0.75 )$
+
+
 
 - T < Transition Temperature
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/814a9e04-7926-4e0d-bcc2-49bc25818aed" />
