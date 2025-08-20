@@ -27,19 +27,44 @@ J < 0 : Anti-Ferromagnetic(이웃 스핀이 반대 방향을 선호)
 몬테카를로 시뮬레이션은 난수(랜덤 숫자)를 활용하여 물리적·공학적 문제를 확률적으로 모델링하는 방법이다.
 복잡한 물리계(ex: 스핀들의 상호작용)에서는 정확한 해를 직접 구하기 어렵지만, 무작위 시뮬레이션을 반복 수행하고 그 평균값을 취하면 실제 해에 점점 수렴하게 된다.
 
+예를 들어, Ising model을 모델링하면 다음과 같다.
+
+- [+1, -1] 가진 spin을 무작위로 N × N 격자에 생성한다.  
+- 무작위로 스핀 하나(Sab)를 선택한 후, 스위칭을 진행하고(ex: +1 -> -1) 인접한 4개의 스핀과 Δ E를 계산한다.(Hamiltonian식 이용)
+
+```math
+
+\mathcal{E} = −J⋅S_{ab}(S_{a−1,b}	+S_{a+1,b}	+S_{a,b+1} +S_{a,b−1}) 
+
+```
+```math
+\mathcal{ΔE} = H_{new} - H_{old} = 2J⋅S_{ab}(S_{a−1,b}	+S_{a+1,b}	+S_{a,b+1} +S_{a,b−1})
+```
+
+- Δ E > 0일 경우, 에너지가 줄어들었기에 스위칭 된 상태를 유지힌다.
+- Δ E < 0일 경우, exp{-ΔE/k_BT} 볼츠만 분포에 따라 확률적으로 결정된다. 0과 1사이의 난수를 뽑고 exp{-ΔE/k_BT} 보다 작을 경우 스위칭 된 상태 유지, 클 경우 기존의 상태를 유지한다.
+  (exp{-ΔE/k_BT} 그래프를 통해 알 수 있듯이, T가 낮을 때는 스위칭 상태를 거절할 확률이 높으며, T가 증가할수록 스위칭 상태를 수용할 확률이 증가한다)
+- e^{-ΔE/k_BT} 볼츠만 분포에 따라 결정되는 것을 Metropolis 알고리즘 방식이라고 한다. 이러한 규칙을 따르는 Metropolis 알고리즘은, 열적 요동(thermal fluctuation)을 나타내며 볼츠만 분포에 따른 올바른 평형 상태를 재현할 수 있도록 한다.
+
+  <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/be093bb3-16b0-40a8-a56d-b5d95b94ae85" /> <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/9e0209d6-b827-4e8e-a208-924e5cf9588b" />
+
+
 ## 무작위 난수 생성
 
 몬테카를로 시뮬레이션을 하기 위해선 난수가 필요하며, python의 `numpy.random`를 이용해 난수를 생성할 것이다.  
-(`state = np.random.randint(2, size=(N,N))` : 무작위로 [0, 1] 값을 갖는 N×N 스핀 격자를 만드는 코드 )  
+`state = np.random.randint(2, size=(N,N))` : 무작위로 0 이상 2미만, 즉 [0, 1] 값을 갖는 N×N 스핀 격자를 만드는 코드   
+`state = 2*np.random.randint(2, size=(N,N))-1` : [0, 1]값에 2를 곱한 후 1을 뺴준다, 즉 [-1, +1] 값을 갖는 N×N 스핀 격자를 만드는 코드
+`plt.imshow(state, cmap="binary")`: state를 이미지처럼 시각화해주는 함수, cmap="binary"은 흑백 컬러맵을 사용한다는 코드(흑: -1, 백: +1)  
+
 <br>
-0과 +1을 가진 난수 2500개를 생성하면 다음과 같다.
+-1과 +1을 가진 난수 2500개를 생성하면 다음과 같다.
 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 
 N = 50
-state = np.random.randint(2, size=(N,N))
+state = 2*np.random.randint(2, size=(N,N))-1
 plt.imshow(state, cmap="binary")
 plt.show()
 ```
@@ -49,36 +74,9 @@ plt.show()
 
 
 
-## 2-D Ising Model using Metropolis Monte Carlo
+## 2-D Ising Model using Metropolis Monte Carlo code
 
-Metropolis 몬테카를로 방법을 이용해 2D Ising model를 구현하는 기본 아이디어는 다음과 같다.
-
-- [+1, -1] 가진 spin을 무작위로 N × N 격자에 생성한다.  
-  `state = 2*np.random.randint(2, size=(N,N))-1` 
-- 무작위로 스핀 하나(Sab)를 선택한 후, 스위칭을 진행하고(ex: +1 -> -1) 인접한 4개의 스핀과 Δ E를 계산한다.
-- Δ E > 0일 경우, 에너지가 줄어들었기에 스위칭 된 상태를 유지힌다.
-- Δ E < 0일 경우, e^{-ΔE/k_BT} 볼츠만 분포에 따라 확률적으로 결정된다. 0과 1사이의 난수를 뽑고 e^{-ΔE/k_BT} 보다 작을 경우 스위칭 된 상태 유지, 클 경우 기존의 상태를 유지한다.
-- e^{-ΔE/k_BT} 볼츠만 분포에 따라 결정되는 것을 Metropolis 알고리즘 방식이라고 한다. 이러한 규칙을 따르는 Metropolis 알고리즘은, 열적 요동(thermal fluctuation)을 나타내며 볼츠만 분포에 따른 올바른 평형 상태를 재현할 수 있도록 한다.
-
-<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/be093bb3-16b0-40a8-a56d-b5d95b94ae85" /> <br>
-
-<br>
-
-```math
-
-\mathcal{E} = −J⋅S_{ab}(S_{a−1,b}	+S_{a+1,b}	+S_{a,b+1} +S_{a,b−1}) 
-
-```
-
-
-  
-```math
-\mathcal{ΔE} = H_{new} - H_{old} = 2J⋅S_{ab}(S_{a−1,b}	+S_{a+1,b}	+S_{a,b+1} +S_{a,b−1})
-```
-<br>
-
-Energy는 Ising model의 Hamiltonian에 따라 위와 같은 식으로 나타낼 수 있다.
-위의 아이디어를 python으로 코드화한 것은 다음과 같다.  
+위의 2-D Ising Model을 모델링한 python 코드는 다음과 같다.  
 ( cost = ΔE , J = 1 , nb = 이웃한 4개의 spin)
 
 ```python
@@ -93,6 +91,28 @@ elif rand() < np.exp(-cost*beta):
  s *= -1
 config[a, b] = s
 ```
+
+`config`:  프로그램의 동작을 제어하는 변수 또는 값을 저장할 떄 사용
+ - input[a, b] : 무작위로 각각 x,y축에서 0~N-1 값을 선택
+ - output[s] : s에 무작위로 선택한 a,b 값을 저장
+ - N×N 반복할 때마다 config는 새로운 값(위치)을 저장하여 에너지를 계산
+
+<br>
+x,y 축의 범위는 (0 ~ N-1)이며, 만약 무작위로 선택된 스핀의 위치의 x가 N-1이면 오른 쪽은 존재하지 않는다.  
+이런 Boundary condition을 해결하기 위해 다음과 같은 code를 사용했다. <br>
+
+     
+`nb = config[(a+1)%N,b] + config[a,(b+1)%N] + config[(a-1)%N,b] + config[a,(b-1)%N]`:
+ - x축 경계일 때(a=N-1) , config[((N-1)+1)%N,b] = config[0 ,b]
+ - y축 경계일 때(b=0)   , config[a,((0)-1)%N] = config[a ,N-1]  
+
+   -> 오른쪽과 왼쪽, 위쪽과 아래쪽이 연결되어 있는 도넛과 같은 형태이다.
+   
+ - 경계가 아닐 경우, (a+1)&N = (a+1) 이므로 영향을 받지 않는다.
+     
+ 
+
+
 
 ## Anisotropic Ising Model 
 
