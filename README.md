@@ -43,6 +43,7 @@ J < 0 : Anti-Ferromagnetic(이웃 스핀이 반대 방향을 선호)
 
 - Δ E > 0일 경우, 에너지가 줄어들었기에 스위칭 된 상태를 유지힌다.
 - Δ E < 0일 경우, exp{-ΔE/k_BT} 볼츠만 분포에 따라 확률적으로 결정된다. 0과 1사이의 난수를 뽑고 exp{-ΔE/k_BT} 보다 작을 경우 스위칭 된 상태 유지, 클 경우 기존의 상태를 유지한다.
+  
   (exp{-ΔE/k_BT} 그래프를 통해 알 수 있듯이, T가 낮을 때는 스위칭 상태를 거절할 확률이 높으며, T가 증가할수록 스위칭 상태를 수용할 확률이 증가한다)
 - e^{-ΔE/k_BT} 볼츠만 분포에 따라 결정되는 것을 Metropolis 알고리즘 방식이라고 한다. 이러한 규칙을 따르는 Metropolis 알고리즘은, 열적 요동(thermal fluctuation)을 나타내며 볼츠만 분포에 따른 올바른 평형 상태를 재현할 수 있도록 한다.
 
@@ -97,14 +98,40 @@ config[a, b] = s
  - output[s] : s에 무작위로 선택한 a,b 값을 저장
  - N×N 반복할 때마다 config는 새로운 값(위치)을 저장하여 에너지를 계산
 
-<br>
-x,y 축의 범위는 (0 ~ N-1)이며, 만약 무작위로 선택된 스핀의 위치의 x가 N-1이면 오른 쪽은 존재하지 않는다.  
-이런 Boundary condition을 해결하기 위해 다음과 같은 code를 사용했다. <br>
+   <br>
+`rand() < np.exp(-cost*beta)` : Metropolis 알고리즘 구현 코드```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+N = 50
+state = 2*np.random.randint(2, size=(N,N))-1
+plt.imshow(state, cmap="binary")
+plt.show()
+
+
+`config`:  프로그램의 동작을 제어하는 변수 또는 값을 저장할 떄 사용
+ - input[a, b] : 무작위로 각각 x,y축에서 0~N-1 값을 선택
+ - output[s] : s에 무작위로 선택한 a,b 값을 저장
+ - N×N 반복할 때마다 config는 새로운 값(위치)을 저장하여 에너지를 계산
+
+`rand() < np.exp(-cost*beta)` : Metropolis 알고리즘 구현 코드  
+
+
+### boundary condition
+
+  
+  <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/721f7957-c936-499c-8948-5571ff330ae2" />
+
+무작위로 선택한 스핀의 위치가 위의 사진처럼 경계에 있다면 인접하는 스핀의 개수는 4개가 아닌 3개가 된다.
+이러한 문제를 해결하기 위해 다음과 같은 code를 사용했다. <br>
 
      
 `nb = config[(a+1)%N,b] + config[a,(b+1)%N] + config[(a-1)%N,b] + config[a,(b-1)%N]`:
- - x축 경계일 때(a=N-1) , config[((N-1)+1)%N,b] = config[0 ,b]
- - y축 경계일 때(b=0)   , config[a,((0)-1)%N] = config[a ,N-1]  
+ - x축 경계일 때(a=N-1, b=3) , config[((N-1)+1)%N,b] = config[0 ,b] 이므로 nb = config[0,3] + config[N-1,4] + config[(N-2),3] + config[N-1,2] 이다. 이것을 그림으로 나타내면 아래와 같다.
+   
+<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/4566acf3-c56a-44e7-a820-c0c1fc9fedf6" />
+
+
 
    -> 오른쪽과 왼쪽, 위쪽과 아래쪽이 연결되어 있는 도넛과 같은 형태이다.
    
@@ -175,8 +202,8 @@ cost = 2 * s * (Jx*nb_x + Jy*nb_y)
 ```python
 nt      = 100          
 N       = 16          
-eqSteps = 1024        
-mcSteps = 1024        
+eqSteps = 1000        
+mcSteps = 1200        
 Jx, Jy  = -1.0, 0.5
 ```
 - nt : 시뮬레이션에서 샘플링할 개수, x축(T)을 몇개의 점으로 나눌 것인지 결정
@@ -187,7 +214,7 @@ Jx, Jy  = -1.0, 0.5
 
 
 Monte Carlo step(MCStep) 한번은 N × N번 스핀을 무작위로 선택해 에너지 변화를 계산하고 평균을 내는 과정이다.<br>
-관측값 하나를 얻기 위해서는 지정한 mcSteps 횟수(1024)만큼 이 과정을 반복해 평균을 낸다.
+관측값 하나를 얻기 위해서는 지정한 mcSteps 횟수(1200)만큼 이 과정을 반복해 평균을 낸다.
 이렇게 얻은 값을 온도 구간을 나눈 개수(nt)만큼 반복하면 시뮬레이션이 완료된다.  
 
 nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까워지지만, 그만큼 시뮬레이션 속도는 느려진다는 단점이 있다.
@@ -197,24 +224,41 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 여기서 분석하는 물리량은 에너지(E), 비열(C), 자화(M), 자기 감수율(X)이며 공식은 다음과 같다.  <br>  
 
 ```math
-\mathcal{\langle  E \rangle} = \frac{1}{N} \sum^{N}_{\langle i \rangle } H_i
+\mathcal{ E } = \frac{1}{N^2} \sum^{N^2}_{\langle i \rangle } H_i
 ```
-```math
-\mathcal{\langle  M \rangle} = \frac{1}{N} \sum^{N}_{\langle i \rangle } S_i
-```
+
 ```math
 \mathcal{C} = \frac{\beta}{T} ( \langle  E^2 \rangle - \langle  E \rangle^2)
 ```
-```math
-\mathcal{X} = \frac{\beta}{T} ( \langle  M^2 \rangle - \langle  M \rangle^2)
-```
+
 <br> 
 
-$( \beta= 1/k_b*T )$ 이며 코드에서는 계산의 용이성을 위해 $( k_b=1 )$로 설정하였다. `Beta = iT = 1.0/T[tt]` 
+- $N^2$은 무작위로 스핀을 뽑은 횟수
+- $\beta= 1/k_b*T$ 이며 코드에서는 계산의 용이성을 위해 $( k_b=1 )$로 설정 -> `Beta = iT = 1.0/T[tt]`
 <br>
 
-비열 C의 공식에서 $( \langle E^2 \rangle - \langle E \rangle^2 )$는 에너지의 분산을 나타낸다. 따라서 C는 T에 따른 에너지의 분산임을 알 수 있으며 자기감수율 X도 이와 같이 T에 따른 자화의 분산이다.
+비열 C의 공식에서 $( \langle E^2 \rangle - \langle E \rangle^2 )$는 에너지의 분산을 나타낸다. 따라서 C는 T에 따른 에너지의 분산임을 알 수 있다.  
+
+따라서, mcstep을 반영한 에너지와 비열은 다음과 같다.
+
+```math
+\mathcal{\langle  E_{mc} \rangle} = \frac{1}{mcstep} \sum^{mcstep}_{\langle t=1 \rangle } E_t
+```
+
+```math
+\mathcal{C_{mcstep}} = \frac{\beta}{T × {mcstep}^2} ( mcstep × \langle E^2_{mc} \rangle - \langle  E_{mc} \rangle^2)
+```
+```math
+ \mathcal{\langle  E^2_{mc} \rangle} = \frac{1}{mcstep} \sum^{mcstep}_{\langle t=1 \rangle } E^2_t,\   \  {\langle  E_{mc} \rangle}^2 =  (\frac{1}{{mcstep}} \sum^{mcstep}_{\langle t=1 \rangle } E_t)^2 
+```
+
 <br>
+
+
+
+
+### - Energy, Specific Heat Results
+
 
 이제 $J_x = -1 , J_y = 0.75$로 교환 상수를 설정하고 몬테카를로 시뮬레이션을 진행하면 결과는 다음과 같다.  
 
@@ -240,28 +284,58 @@ $( \beta= 1/k_b*T )$ 이며 코드에서는 계산의 용이성을 위해 $( k_b
 - 위의 그래프를 통해 더 직관적으로 이해할 수 있다.
 - Jy / |Jx| 의 비율이 증가할수록 Transition Temperature가 선형적으로 증가하는것을 보여준다.
 
-- Jy / Jx = -0.75
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/91da076a-b343-44af-800b-3d25bcc37663" />
 
-<br>
+### - Spin Ordering Across the Transition Temperature
 
-- Jy / Jx = 0.75
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/4b139704-f275-4164-b2d1-671cfbaf63e8" />
+다음으로, Transition Temperature를 기준으로 전, 후 스핀들의 배치가 어떻게 변하는 지 확인해보겠다. $( J_x = -1 , J_y = 0.75 )$
 
-<br>
+#### 1) T < Transition Temperature( T = 0.4)
 
-Transition Temperature를 기준으로 전, 후 스핀들의 배치가 어떻게 변하는 지 확인해보겠다. $( J_x = -1 , J_y = 0.75 )$
-
-
-
-- T < Transition Temperature
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/814a9e04-7926-4e0d-bcc2-49bc25818aed" />
 
+- 무작위로 정렬되어 있던 스핀들이 Monte Carlo step이 증가할 수록 세로 스트라이프 형태로 정렬됨을 확인할 수 있다.  
+- $( J_x = -1 , J_y = 0.75 )$로 설정했기에, x축은 Anti Ferromagnetic, y축은 Ferromagnetic을 선호하여 세로 스트라이프 형태로 정렬된다
 <br>
-
-- T > Transition Temperature
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/0d4c353b-4054-479b-97b9-6840a96ecb21" />
+  <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/ed9b1eb6-3dde-4ef6-b893-6145ec191add" /> <br>
 
   
-![ising (2)](https://github.com/user-attachments/assets/90f22188-d600-4b87-b536-6bb5e12a2a14)
+  
+ 
+<br>
+
+#### 2) T > Transition Temperature( T = 2.4)  
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/0d4c353b-4054-479b-97b9-6840a96ecb21" />
+
+- Transition Temperature 이상에서 위와 동일한 step으로 시뮬레이션을 돌렸으나 스핀들이 정렬되지 않음을 확인할 수 있다.
+- 이는 상전이가 일어나 스핀들이 무질서하게 배치되었음을 의미한다.
+  
+
+
+## Anisotropic 2D Ising Model with Diagonal Interactions
+
+최근접 이웃 4개와 다음 근접 이웃인 대각선 이웃4개를 포함하여 몬테카를로 시뮬레이션을 진행하고, Jd 크기에 따라 평형상태가 어떻게 바뀌는지 분석했다.
+
+<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/8c1a71df-cc40-494d-ada7-0023a55f9318" />  
+
+
+대각선 Jd를 반영한 에너지식은 다음과 같다. 
+
+
+```math
+
+\mathcal{E_{anisotropic}} = −J_x⋅S_{ab}(S_{a−1,b}	+S_{a+1,b}) - J_y⋅S_{ab}(S_{a,b+1} +S_{a,b−1})- J_d⋅S_{ab}(S_{a+1,b+1} +S_{a+1,b−1} +S_{a-1,b+1} +S_{a-1,b−1}) 
+
+```
+```math
+
+\mathcal{ΔE_{anisotropic}} = 2⋅S_{ab}( J_x (S_{a−1,b}	+S_{a+1,b}) + J_y (S_{a,b+1} +S_{a,b−1}) + J_d (S_{a+1,b+1} +S_{a+1,b−1} +S_{a-1,b+1} +S_{a-1,b−1}) ) 
+
+```
+
+### - |Jx| = Jy ≠ Jd
+
+  #### 1) Jd < |Jx| = Jy
+
+
 
