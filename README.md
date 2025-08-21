@@ -54,7 +54,7 @@ J < 0 : Anti-Ferromagnetic(이웃 스핀이 반대 방향을 선호)
 
 몬테카를로 시뮬레이션을 하기 위해선 난수가 필요하며, python의 `numpy.random`를 이용해 난수를 생성할 것이다.  
 `state = np.random.randint(2, size=(N,N))` : 무작위로 0 이상 2미만, 즉 [0, 1] 값을 갖는 N×N 스핀 격자를 만드는 코드   
-`state = 2*np.random.randint(2, size=(N,N))-1` : [0, 1]값에 2를 곱한 후 1을 뺴준다, 즉 [-1, +1] 값을 갖는 N×N 스핀 격자를 만드는 코드
+`state = 2*np.random.randint(2, size=(N,N))-1` : [0, 1]값에 2를 곱한 후 1을 빼준다, 즉 [-1, +1] 값을 갖는 N×N 스핀 격자를 만드는 코드
 `plt.imshow(state, cmap="binary")`: state를 이미지처럼 시각화해주는 함수, cmap="binary"은 흑백 컬러맵을 사용한다는 코드(흑: -1, 백: +1)  
 
 <br>
@@ -204,7 +204,6 @@ Energy, Specific Heat의 몬테카를로 시뮬레이션 코드는 `main.py`에 
 ```python
 Jx, Jy  = -1.0, 0.75
 
-nt      = 100
 N       = 16
 eqSteps = 1000
 mcSteps = 1200
@@ -227,7 +226,7 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 추가적으로, Jx < 0 , Jy > 0 로 설정하여 x축은 Anti-Ferromagnetic을 선호하고 y축은 Ferromagnetic을 선호하게 모델링하였다.  
 
 
-여기서 분석하는 물리량은 에너지(E), 비열(C), 자화(M), 자기 감수율(X)이며 공식은 다음과 같다.  <br>  
+여기서 분석하는 물리량은 에너지(E), 비열(C)이며 공식은 다음과 같다.  <br>  
 
 ```math
 \mathcal{ E } = \frac{1}{N^2} \sum^{N^2}_{\langle i \rangle } H_i
@@ -286,7 +285,7 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/943b00c2-c947-4912-8fb7-b2224709d84f" />
 
 - 위의 그래프를 통해 더 직관적으로 이해할 수 있다.
-- Jy / |Jx| 의 비율이 증가할수록 Transition Temperature가 선형적으로 증가하는것을 보여준다.
+- Transition Temperature는 Jy / |Jx| 의 비율에 영향을 받으며, 비율이 증가함에 따라 선형적으로 증가하는것을 보여준다.
 
 
 ### - Spin Ordering Across the Transition Temperature
@@ -304,18 +303,26 @@ def output(f, config, i, n_, N):
     color_map[config == 1]  = [1.0, 0.5, 0.0]   # 주황색
     color_map[config == -1] = [0.0, 0.3, 0.8]   # 파란색
 
-    plt.imshow(color_map, interpolation='nearest')
-    plt.title(f'Monte Carlo step={i}')
-    plt.axis('off')
+...
 
-    up_patch   = mpatches.Patch(color=[1.0, 0.5, 0.0], label='Spin Up')
-    down_patch = mpatches.Patch(color=[0.0, 0.3, 0.8], label='Spin Down')
-    plt.legend(handles=[up_patch, down_patch], loc="upper right", fontsize=8)
+def simulate(N=64, temp=0.4, Jx=-1.0, Jy=0.75): # 분석하고 싶은 값 넣기
+    config = 2*np.random.randint(2, size=(N,N)) - 1   
+
+    f = plt.figure(figsize=(15, 10), dpi=80)
+    snapshots = [0, 50, 500, 1000, 2000, 4000]
+    plot_index = 1
+
+    for i in range(max(snapshots)+1):
+        mcmove(config, 1.0/temp, N, Jx, Jy)
+        if i in snapshots:
+            output(f, config, i, plot_index, N)
+            plot_index += 1
+
 ```
 `sp = f.add_subplot(2, 3, n_)` : f의 subplot을 2행 3열로 출력, n_는 몇번 째에 위치할지 정함  
 `plt.setp(sp.get_yticklabels(), visible=False)` : y축의 눈금을 제거  
-`color_map = np.zeros((N, N, 3))` : N × N 를 0으로 초기화하고 3(R,G,B)으로 표시  
-`plt.imshow(color_map, interpolation='nearest')` : color_map 배열을 픽셀 단위로 확대하여 색을 섞지 않고 격자 그대로 표시  
+`color_map = np.zeros((N, N, 3))` : N × N 를 0으로 초기화하고 3(R,G,B)으로 표시    
+`snapshots = [0, 50, 500, 1000, 2000, 4000]` : 찍고 싶은 Monte Carlo step 설정
 
 이제, $( J_x = -1 , J_y = 0.75 )$ 으로 설정하고 T를 변경해가며 스핀 정렬을 확인해보겠다.
 
@@ -392,11 +399,13 @@ def output(f, config, i, n_, N):
 ### - Jx < Jy < Jd (Jx < 0)
 
  #### 1) Jx = -1, Jy = 1 Jd = 1.25
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/8a13da74-9e13-4c42-a238-58d578b25cd1" />
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/45e0563a-6985-4d28-a328-99281a8eb663" />
+
 
 
   #### 2) Jx = -1, Jy = 1 Jd = 1.5
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/175f1f18-da87-4f6b-8380-edab123f3f44" />
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/472c19a9-cd48-468e-be58-897dd9cdcee8" />
+
 
 
   위와 같은 복잡한 상호작용이 존재하는 경우 평형상태를 직접적으로 예측하기는 어렵다. 그러나 몬테카를로 시뮬레이션을 통해 충분히 반복 수행하여 평균값을 취하면, 결과는 점차 실제 평형상태에 수렴하게 되며, 이는 몬테카를로 방법의 가장 큰 장점이라 할 수 있다.
