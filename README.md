@@ -364,10 +364,46 @@ def output(f, config, i, n_, N):
 \mathcal{ΔE_{anisotropic}} = 2⋅S_{ab}( J_x (S_{a−1,b}	+S_{a+1,b}) + J_y (S_{a,b+1} +S_{a,b−1}) + J_d (S_{a+1,b+1} +S_{a+1,b−1} +S_{a-1,b+1} +S_{a-1,b−1}) ) 
 
 ```
+`spin odering_diagonal.py`에 위의 식을 반영을 했으며, 직접 J를 변경해가며 시뮬레이션을 진행했다. (T = 0.4 고정)
 
-### - |Jx| = Jy ≠ Jd
+### - Jx = Jy > 0 , Jd < 0
 
-  #### 1) Jd < |Jx| = Jy
+  #### 1) |Jd| < Jx = Jy (Jd = - 0.5, Jx=Jy=1)
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/de381edf-d7e8-4db3-a593-54bceb35a3b2" />
+
+
+  #### 2) |Jd| > Jx = Jy (Jd = - 1.5, Jx=Jy=1)
+
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/45d63d08-5517-4a99-b3e1-0cb9a2a34b24" />
+
+
+### - Jx < Jd < Jy (Jx < 0)
 
 
 
+  #### 1) Jx = -1, Jd = 0.5, Jy = 1
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/ea877707-1595-475d-be79-fcbde1276c26" />
+
+
+  #### 2) Jx = -1, Jd = 0.75, Jy = 1
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/e9d1794e-7ce8-4fe7-97cf-ee7328ee036a" />
+
+### - Jx < Jy < Jd (Jx < 0)
+
+ #### 1) Jx = -1, Jy = 1 Jd = 1.25
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/8a13da74-9e13-4c42-a238-58d578b25cd1" />
+
+
+  #### 2) Jx = -1, Jy = 1 Jd = 1.5
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/175f1f18-da87-4f6b-8380-edab123f3f44" />
+
+
+  위와 같은 복잡한 상호작용이 존재하는 경우 평형상태를 직접적으로 예측하기는 어렵다. 그러나 몬테카를로 시뮬레이션을 통해 충분히 반복 수행하여 평균값을 취하면, 결과는 점차 실제 평형상태에 수렴하게 되며, 이는 몬테카를로 방법의 가장 큰 장점이라 할 수 있다.
+
+
+
+
+
+
+  
