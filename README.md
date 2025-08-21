@@ -81,16 +81,21 @@ plt.show()
 ( cost = ΔE , J = 1 , nb = 이웃한 4개의 spin)
 
 ```python
-a = np.random.randint(0, N)
-b = np.random.randint(0, N)
-s =  config[a, b]
-nb = config[(a+1)%N,b] + config[a,(b+1)%N] + config[(a-1)%N,b] + config[a,(b-1)%N]
-cost = 2*s*nb
-if cost < 0:
- s *= -1
-elif rand() < np.exp(-cost*beta):
- s *= -1
-config[a, b] = s
+def mcmove(config, beta, Jx, Jy):
+    for i in range(N):
+        for j in range(N):
+            a = np.random.randint(0, N)
+            b = np.random.randint(0, N)
+            s = config[a, b]
+            nb_x = config[(a+1)%N, b] + config[(a-1)%N, b]
+            nb_y = config[a, (b+1)%N] + config[a, (b-1)%N]
+            cost = 2 * s * (Jx*nb_x + Jy*nb_y)
+            if cost < 0:
+                s *= -1
+            elif rand() < np.exp(-cost * beta):
+                s *= -1
+            config[a, b] = s
+    return config
 ```
 
 `config`:  프로그램의 동작을 제어하는 변수 또는 값을 저장할 떄 사용
@@ -99,22 +104,13 @@ config[a, b] = s
  - N×N 반복할 때마다 config는 새로운 값(위치)을 저장하여 에너지를 계산
 
    <br>
-`rand() < np.exp(-cost*beta)` : Metropolis 알고리즘 구현 코드```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-N = 50
-state = 2*np.random.randint(2, size=(N,N))-1
-plt.imshow(state, cmap="binary")
-plt.show()
-
-
-`config`:  프로그램의 동작을 제어하는 변수 또는 값을 저장할 떄 사용
- - input[a, b] : 무작위로 각각 x,y축에서 0~N-1 값을 선택
- - output[s] : s에 무작위로 선택한 a,b 값을 저장
- - N×N 반복할 때마다 config는 새로운 값(위치)을 저장하여 에너지를 계산
-
 `rand() < np.exp(-cost*beta)` : Metropolis 알고리즘 구현 코드  
+(`from numpy.random import rand`을 통해 rand()를 사용)  
+
+   <br>
+따라서, mcmove는 Metropolis 알고리즘을 이용하여 스핀들이 스위칭 될지 말지 결정하는 함수이다.
+
+
 
 
 ### boundary condition
@@ -197,20 +193,30 @@ cost = 2 * s * (Jx*nb_x + Jy*nb_y)
 
 ## Monte Carlo Simulation Results
 
-몬테카를로 시뮬레이션을 돌리기 위해서는 아래와 같은 파라미터들을 설정해야 한다.<br>
+### - Energy, Specific Heat Results
+
+Energy, Specific Heat의 몬테카를로 시뮬레이션 코드는 `main.py`에 있다.
+우리가 컨트롤하는 주요 parameters는 다음과 같다.
+
+
+
 
 ```python
-nt      = 100          
-N       = 16          
-eqSteps = 1000        
-mcSteps = 1200        
-Jx, Jy  = -1.0, 0.5
+Jx, Jy  = -1.0, 0.75
+
+nt      = 100
+N       = 16
+eqSteps = 1000
+mcSteps = 1200
+nt      = 100
+T       = np.linspace(1.5, 3.3, nt)
 ```
-- nt : 시뮬레이션에서 샘플링할 개수, x축(T)을 몇개의 점으로 나눌 것인지 결정
+- Jx, Jy  : 교환 상수 J를 변화시키며 상전이 시점을 분석
 - N  : 격자 한변의 길이
 - eqSteps : 평형으로 가기 위한 Monte Carlo steps (시스템을 초기 랜덤 상태에서 안정화시키기 위해)
 - mcSteps : 평형 이후 실제 측정에 사용하는 Monte Carlo steps
-- Jx, Jy  : 교환 상수 J를 변화시키며 상전이 시점을 분석
+- nt : 시뮬레이션에서 샘플링할 개수
+- T=np.linspace(1.5, 3.3, nt) : 1.5부터 3.3까지를 등간격으로 nt번 분할
 
 
 Monte Carlo step(MCStep) 한번은 N × N번 스핀을 무작위로 선택해 에너지 변화를 계산하고 평균을 내는 과정이다.<br>
@@ -257,8 +263,6 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 
 
 
-### - Energy, Specific Heat Results
-
 
 이제 $J_x = -1 , J_y = 0.75$로 교환 상수를 설정하고 몬테카를로 시뮬레이션을 진행하면 결과는 다음과 같다.  
 
@@ -287,9 +291,37 @@ nt, N, mcSteps 값을 늘릴수록 결과가 실제 해(정확한 값)에 가까
 
 ### - Spin Ordering Across the Transition Temperature
 
-다음으로, Transition Temperature를 기준으로 전, 후 스핀들의 배치가 어떻게 변하는 지 확인해보겠다. $( J_x = -1 , J_y = 0.75 )$
+다음으로, Transition Temperature를 기준으로 전, 후 스핀들의 배치가 어떻게 변하는 지 `spin ordering.py`를 통해 확인해보겠다. 
+`spin ordering.py`의 mcmove는 `main.py`와 같다. 
 
-#### 1) T < Transition Temperature( T = 0.4)
+```python
+def output(f, config, i, n_, N):
+    sp = f.add_subplot(2, 3, n_)
+    plt.setp(sp.get_yticklabels(), visible=False)
+    plt.setp(sp.get_xticklabels(), visible=False)
+
+    color_map = np.zeros((N, N, 3))
+    color_map[config == 1]  = [1.0, 0.5, 0.0]   # 주황색
+    color_map[config == -1] = [0.0, 0.3, 0.8]   # 파란색
+
+    plt.imshow(color_map, interpolation='nearest')
+    plt.title(f'Monte Carlo step={i}')
+    plt.axis('off')
+
+    up_patch   = mpatches.Patch(color=[1.0, 0.5, 0.0], label='Spin Up')
+    down_patch = mpatches.Patch(color=[0.0, 0.3, 0.8], label='Spin Down')
+    plt.legend(handles=[up_patch, down_patch], loc="upper right", fontsize=8)
+```
+`sp = f.add_subplot(2, 3, n_)` : f의 subplot을 2행 3열로 출력, n_는 몇번 째에 위치할지 정함  
+`plt.setp(sp.get_yticklabels(), visible=False)` : y축의 눈금을 제거  
+`color_map = np.zeros((N, N, 3))` : N × N 를 0으로 초기화하고 3(R,G,B)으로 표시  
+`plt.imshow(color_map, interpolation='nearest')` : color_map 배열을 픽셀 단위로 확대하여 색을 섞지 않고 격자 그대로 표시  
+
+이제, $( J_x = -1 , J_y = 0.75 )$ 으로 설정하고 T를 변경해가며 스핀 정렬을 확인해보겠다.
+
+
+
+#### 1) T < Transition Temperature( T = 0.4, )
 
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/814a9e04-7926-4e0d-bcc2-49bc25818aed" />
 
