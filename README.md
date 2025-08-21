@@ -398,8 +398,9 @@ def simulate(N=64, temp=0.4, Jx=-1.0, Jy=0.75): # 분석하고 싶은 값 넣기
 
 ### - Jx < Jy < Jd (Jx < 0)
 
- #### 1) Jx = -1, Jy = 1 Jd = 1.25
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/45e0563a-6985-4d28-a328-99281a8eb663" />
+ #### 1) Jx = -1, Jy = 1, Jd = 1.25
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/ac981688-e02f-4f8c-925e-e6aa13b217aa" />
+
 
 
 
